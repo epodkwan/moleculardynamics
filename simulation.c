@@ -16,8 +16,8 @@ const int framerate=10;         //Output rate
 const double sigma=3.4;         //(in angstrom)
 const double epsilon=1.03e-2;   //(in eV)
 const double tau=100;           //(in ps^-1)
-const double bathtemp=85;      //Heatbath temperature (in K)
-const int qlength=1000;         //Queue length
+const double bathtemp=85;       //Heatbath temperature (in K)
+const int qlength=1000;         
 
 void 
     initialp(double a[][3], double b[][3][2]),                                                                                                              //Initialize particle position
