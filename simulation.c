@@ -166,7 +166,7 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
             fprintf(particle, "frame %d\n", frame);
             for (j=0; j<n; ++j)
             {
-                fprintf(particle, "Ar %lf\t%lf\t%lf\n", parpos[j][0], parpos[j][1], parpos[j][2]);              //Output particle position
+                fprintf(particle, "Ar %lf\t%lf\t%lf\n", parpos[j][0], parpos[j][1], parpos[j][2]);                                                       //Output particle position
             }
         }
     }
@@ -248,12 +248,12 @@ void cmcorr(double a[][3], int n)
         sum=0;
         for (j=0; j<n; ++j)
         {
-            sum=sum+a[j][i];
+            sum=sum+a[j][i];        //Calculate the velocity of center of mass
         }
         temp=sum/n;
         for (j=0; j<n; ++j)
         {
-            a[j][i]=a[j][i]-temp;
+            a[j][i]=a[j][i]-temp;   //Set the velocity of center of mass to 0
         }
     }
     return;
@@ -280,7 +280,7 @@ void calf(double s[][3], double f[][3], int n, double sig, double eps)
             {
                 r[k]=s[i][k]-s[j][k];
             }
-            d2=r[0]*r[0]+r[1]*r[1]+r[2]*r[2];
+            d2=r[0]*r[0]+r[1]*r[1]+r[2]*r[2];                               //Calculate distance squared
             d=sqrt(d2);
             temp2=sig2/d2;
             temp6=temp2*temp2*temp2;
@@ -317,7 +317,7 @@ void thermalbath(double parv[][3], double temperature, double t0, double n, doub
     {
         for (j=0; j<3; ++j)
         {
-            parv[i][j]=parv[i][j]*sqrt(1+((t0/temperature-1)/tau));
+            parv[i][j]=parv[i][j]*sqrt(1+((t0/temperature-1)/tau));                     //Berendsen Thermostat
         }
     }
     return;
