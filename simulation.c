@@ -10,8 +10,8 @@ const double timestep=0.01;     //Delta t (in ps)
 const int count=512;            //Number of particles
 const double size=45;           //Side length of the box (in angstrom)
 const double temp0=600;         //Initial temperature (in K)
-const double armass=39.948;     //Ar mass (in u)
-const int stepnum=5000;         //Number of steps taken
+const double armass=39.948;     //Particle (Ar) mass (in u)
+const int stepnum=5000;         //Number of steps
 const int framerate=10;         //Output rate
 const double sigma=3.4;         //(in angstrom)
 const double epsilon=1.03e-2;   //(in eV)
@@ -49,6 +49,7 @@ int main()
     return 0;
 }
 
+//Generate particles in a box with regular separation
 void initialp(double a[][3], double b[][3][2])
 {
     int i, j, k, m;
@@ -76,6 +77,7 @@ void initialp(double a[][3], double b[][3][2])
     return;
 }
 
+//Random velocity with respect to temperature
 void initialv(double a[][3], double tem, double mass, int n)
 {
     int i, j;
@@ -86,9 +88,9 @@ void initialv(double a[][3], double tem, double mass, int n)
     {
         for (j=0; j<3; ++j)
         {
-            x1=(rand() % 999+1)/1000.0;                         //Box-Muller transform
-            x2=(rand() % 999+1)/1000.0;                         //Box-Muller transform
-            a[i][j]=sqrt(-2*log(x1))*cos(2*M_PI*x2)*sf;
+            x1=(rand() % 999+1)/1000.0;
+            x2=(rand() % 999+1)/1000.0;
+            a[i][j]=sqrt(-2*log(x1))*cos(2*M_PI*x2)*sf;         //Box-Muller transform
         }
     }
     return;
@@ -113,7 +115,7 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
 
     frame=0;
     calf(parpos, force, n, sigma, epsilon);
-    particle=fopen("particle.xyz", "w");
+    particle=fopen("particle.xyz", "w");                                                                                                                 //Store particle position
     virtuald=fopen("virtualposition.txt", "w");
     velocity=fopen("velocity.txt", "w");
     tempf=fopen("temperature.txt", "w");
@@ -121,17 +123,17 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
     fprintf(particle, "frame 0\n");
     for (j=0; j<n; ++j)
     {
-        fprintf(particle, "Ar %lf\t%lf\t%lf\n", parpos[j][0], parpos[j][1], parpos[j][2]);                  //Output initial position
+        fprintf(particle, "Ar %lf\t%lf\t%lf\n", parpos[j][0], parpos[j][1], parpos[j][2]);                                                               //Output initial position
     }
     fprintf(virtuald, "%d\n", 0);
     for (j=0; j<n; ++j)
     {
-        fprintf(virtuald, "%d\t%lf\t%lf\t%lf\n", j, virpos[j][0][0], virpos[j][1][0], virpos[j][2][0]);     //Output particle position regardless of the boundary
+        fprintf(virtuald, "%d\t%lf\t%lf\t%lf\n", j, virpos[j][0][0], virpos[j][1][0], virpos[j][2][0]);
     }
     fprintf(velocity, "0\n");
     for (j=0; j<n; ++j)
     {
-        fprintf(velocity, "%d\t%lf\t%lf\t%lf\n", j, parv[j][0], parv[j][1], parv[j][2]);;                   //Output particle velocity
+        fprintf(velocity, "%d\t%lf\t%lf\t%lf\n", j, parv[j][0], parv[j][1], parv[j][2]);
     }
     for (i=1; i<=stepnum; ++i)
     {
