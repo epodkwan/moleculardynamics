@@ -119,25 +119,25 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
     frame=0;
     calf(parpos, force, n, sigma, epsilon);
     particle=fopen("particle.xyz", "w");                                                                    //Store particle position
-    virtuald=fopen("virtualposition.txt", "w");
-    velocity=fopen("velocity.txt", "w");
-    tempf=fopen("temperature.txt", "w");
+    // virtuald=fopen("virtualposition.txt", "w");
+    // velocity=fopen("velocity.txt", "w");
+    // tempf=fopen("temperature.txt", "w");
     fprintf(particle, "%d\n", n);
     fprintf(particle, "frame 0\n");
     for (j=0; j<n; ++j)
     {
         fprintf(particle, "Ar %lf\t%lf\t%lf\n", parpos[j][0], parpos[j][1], parpos[j][2]);                  //Output initial position
     }
-    fprintf(virtuald, "%d\n", 0);
-    for (j=0; j<n; ++j)
-    {
-        fprintf(virtuald, "%d\t%lf\t%lf\t%lf\n", j, virpos[j][0][0], virpos[j][1][0], virpos[j][2][0]);
-    }
-    fprintf(velocity, "0\n");
-    for (j=0; j<n; ++j)
-    {
-        fprintf(velocity, "%d\t%lf\t%lf\t%lf\n", j, parv[j][0], parv[j][1], parv[j][2]);
-    }
+    // fprintf(virtuald, "%d\n", 0);
+    // for (j=0; j<n; ++j)
+    // {
+    //     fprintf(virtuald, "%d\t%lf\t%lf\t%lf\n", j, virpos[j][0][0], virpos[j][1][0], virpos[j][2][0]);
+    // }
+    // fprintf(velocity, "0\n");
+    // for (j=0; j<n; ++j)
+    // {
+    //     fprintf(velocity, "%d\t%lf\t%lf\t%lf\n", j, parv[j][0], parv[j][1], parv[j][2]);
+    // }
     for (i=1; i<=stepnum; ++i)
     {
         walk(parpos, parv, force, virpos, n, timestep, size, mass);
@@ -147,21 +147,21 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
         calspeedsq(parv, speedsq, n);
         temperature[i % qlength]=mass*sumarray(speedsq, n)/n/3/Kb;
         thermalbath(parv, temperature[i % qlength], bathtemp, n, tau);
-        fprintf(virtuald, "%d\n", i);
-        for (j=0; j<n; ++j)
-        {
-            fprintf(virtuald, "%d\t%lf\t%lf\t%lf\n", j, virpos[j][0][0], virpos[j][1][0], virpos[j][2][0]);
-        }
-        fprintf(velocity, "%d\n", i);
-        for (j=0; j<n; ++j)
-        {
-            fprintf(velocity, "%d\t%lf\t%lf\t%lf\n", j, parv[j][0], parv[j][1], parv[j][2]);
-        }
-        if (i>=qlength)
-        {
-            temp=sumarray(temperature, qlength)/qlength;
-            fprintf(tempf, "%d\t%lf\n", i, temp);
-        }
+        // fprintf(virtuald, "%d\n", i);
+        // for (j=0; j<n; ++j)
+        // {
+        //     fprintf(virtuald, "%d\t%lf\t%lf\t%lf\n", j, virpos[j][0][0], virpos[j][1][0], virpos[j][2][0]);
+        // }
+        // fprintf(velocity, "%d\n", i);
+        // for (j=0; j<n; ++j)
+        // {
+        //     fprintf(velocity, "%d\t%lf\t%lf\t%lf\n", j, parv[j][0], parv[j][1], parv[j][2]);
+        // }
+        // if (i>=qlength)
+        // {
+        //     temp=sumarray(temperature, qlength)/qlength;
+        //     fprintf(tempf, "%d\t%lf\n", i, temp);
+        // }
         if (i % framerate==0)
         {
             frame=frame+framerate;
@@ -174,9 +174,9 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
         }
     }
     fclose(particle);
-    fclose(virtuald);
-    fclose(velocity);
-    fclose(tempf);
+    // fclose(virtuald);
+    // fclose(velocity);
+    // fclose(tempf);
     return;
 }
 
@@ -190,39 +190,39 @@ void walk(double s[][3], double v[][3], double f[][3], double vp[][3][2], int n,
         for (j=0; j<3; ++j)
         {
             s[i][j]=s[i][j]+(v[i][j]+f[i][j]/2/mass*deltat)*deltat;
-            if (vp[i][j][1]==0)
-            {
-                vp[i][j][0]=vp[i][j][0]+(v[i][j]+f[i][j]/2/mass*deltat)*deltat;
-            }
-            else
-            {
-                vp[i][j][0]=vp[i][j][0]-(v[i][j]+f[i][j]/2/mass*deltat)*deltat;
-            }
+            // if (vp[i][j][1]==0)
+            // {
+            //     vp[i][j][0]=vp[i][j][0]+(v[i][j]+f[i][j]/2/mass*deltat)*deltat;
+            // }
+            // else
+            // {
+            //     vp[i][j][0]=vp[i][j][0]-(v[i][j]+f[i][j]/2/mass*deltat)*deltat;
+            // }
             if (s[i][j]<0)                                                      //Hitting the boundary
             {
                 s[i][j]=-s[i][j];
                 v[i][j]=-v[i][j];
-                if (vp[i][j][1]==0)
-                {
-                    vp[i][j][1]=1;
-                }
-                else
-                {
-                    vp[i][j][1]=0;
-                }
+                // if (vp[i][j][1]==0)
+                // {
+                //     vp[i][j][1]=1;
+                // }
+                // else
+                // {
+                //     vp[i][j][1]=0;
+                // }
             }
             if (s[i][j]>bd)                                                  //Hitting the boundary
             {
                 s[i][j]=bd+bd-s[i][j];
                 v[i][j]=-v[i][j];
-                if (vp[i][j][1]==0)
-                {
-                    vp[i][j][1]=1;
-                }
-                else
-                {
-                    vp[i][j][1]=0;
-                }
+                // if (vp[i][j][1]==0)
+                // {
+                //     vp[i][j][1]=1;
+                // }
+                // else
+                // {
+                //     vp[i][j][1]=0;
+                // }
             }
         }        
     }
