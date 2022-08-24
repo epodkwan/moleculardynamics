@@ -13,25 +13,25 @@ const double temp0=600;         //Initial temperature (in K)
 const double armass=39.948;     //Particle (Ar) mass (in u)
 const int stepnum=5000;         //Number of steps
 const int framerate=10;         //Output rate
-const double sigma=3.4;         //(in angstrom)
-const double epsilon=1.03e-2;   //(in eV)
-const double tau=100;           //(in ps^-1)
+const double sigma=3.4;         //(in angstrom) for Lennard-Jones potential
+const double epsilon=1.03e-2;   //(in eV) for Lennard-Jones potential
+const double tau=100;           //(in ps^-1) for Berendsen Thermostat
 const double bathtemp=85;       //Heatbath temperature (in K)
 const int qlength=1000;         //Queue length
 
 void 
-    initialp(double a[][3], double b[][3][2]),                                                                                                              //Initialize particle position
-    initialv(double a[][3], double tem, double mass, int n),                                                                                                //Initialize particle velocity
-    calspeedsq(double a[][3], double b[], int n),                                                                                                           //Calculate velocity squared
+    initialp(double a[][3], double b[][3][2]),                                                                                                              
+    initialv(double a[][3], double tem, double mass, int n),                                                                                                
+    calspeedsq(double a[][3], double b[], int n),                                                                                                           
     output(double parpos[][3], double parv[][3], double force[][3], double virpos[][3][2], int n, double speedsq[], double temperature[], double mass),
-    walk(double s[][3], double v[][3], double f[][3], double vp[][3][2], int n, double deltat, double bd, double mass),                                     //Move one step for all particle
-    cmcorr(double a[][3], int n),                                                                                                                           //Center of mass correction
-    calv(double v[][3], double f[][3], int n, double mass, double deltat),                                                                                  //Calculate new velocity
-    calf(double s[][3], double f[][3], int n, double lamb, double eps),                                                                                     //Calculate force
-    thermalbath(double parv[][3], double temperature, double t0, double n, double tau);                                                                     //Heat bath
+    walk(double s[][3], double v[][3], double f[][3], double vp[][3][2], int n, double deltat, double bd, double mass),                                     
+    cmcorr(double a[][3], int n),                                                                                                                           
+    calv(double v[][3], double f[][3], int n, double mass, double deltat),                                                                                  
+    calf(double s[][3], double f[][3], int n, double lamb, double eps),                                                                                     
+    thermalbath(double parv[][3], double temperature, double t0, double n, double tau);                                                                     
 
 double
-    sumarray(double a[], int n);    //Sum an array
+    sumarray(double a[], int n);
     
 int main()
 {
@@ -41,7 +41,7 @@ int main()
     printf("Seed: ");
     scanf("%d", &seed);
     srand(seed);
-    mass=armass*utoev/c0/c0;                                                                                                    //Calculate the mass of a particle in eV
+    mass=armass*utoev/c0/c0;                                                    //Calculate the mass of a particle in eV
     initialp(parpos, virpos);
     initialv(parv, temp0, mass, count);
     cmcorr(parv, count);
@@ -49,6 +49,7 @@ int main()
     return 0;
 }
 
+//Initialize particle position
 //Generate particles in a box with regular separation
 void initialp(double a[][3], double b[][3][2])
 {
@@ -77,6 +78,7 @@ void initialp(double a[][3], double b[][3][2])
     return;
 }
 
+//Initialize particle velocity
 //Random velocity with respect to temperature
 void initialv(double a[][3], double tem, double mass, int n)
 {
@@ -96,6 +98,7 @@ void initialv(double a[][3], double tem, double mass, int n)
     return;
 }
 
+//Calculate velocity squared
 void calspeedsq(double a[][3], double b[], int n)
 {
     int i;
@@ -115,7 +118,7 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
 
     frame=0;
     calf(parpos, force, n, sigma, epsilon);
-    particle=fopen("particle.xyz", "w");                                                                                                                 //Store particle position
+    particle=fopen("particle.xyz", "w");                                                                    //Store particle position
     virtuald=fopen("virtualposition.txt", "w");
     velocity=fopen("velocity.txt", "w");
     tempf=fopen("temperature.txt", "w");
@@ -123,7 +126,7 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
     fprintf(particle, "frame 0\n");
     for (j=0; j<n; ++j)
     {
-        fprintf(particle, "Ar %lf\t%lf\t%lf\n", parpos[j][0], parpos[j][1], parpos[j][2]);                                                               //Output initial position
+        fprintf(particle, "Ar %lf\t%lf\t%lf\n", parpos[j][0], parpos[j][1], parpos[j][2]);                  //Output initial position
     }
     fprintf(virtuald, "%d\n", 0);
     for (j=0; j<n; ++j)
@@ -177,6 +180,7 @@ void output(double parpos[][3], double parv[][3], double force[][3], double virp
     return;
 }
 
+//Move one step for all particle
 void walk(double s[][3], double v[][3], double f[][3], double vp[][3][2], int n, double deltat, double bd, double mass)
 {
     int i, j;
@@ -194,7 +198,7 @@ void walk(double s[][3], double v[][3], double f[][3], double vp[][3][2], int n,
             {
                 vp[i][j][0]=vp[i][j][0]-(v[i][j]+f[i][j]/2/mass*deltat)*deltat;
             }
-            if (s[i][j]<0)
+            if (s[i][j]<0)                                                      //Hitting the boundary
             {
                 s[i][j]=-s[i][j];
                 v[i][j]=-v[i][j];
@@ -207,7 +211,7 @@ void walk(double s[][3], double v[][3], double f[][3], double vp[][3][2], int n,
                     vp[i][j][1]=0;
                 }
             }
-            if (s[i][j]>bd)
+            if (s[i][j]>bd)                                                  //Hitting the boundary
             {
                 s[i][j]=bd+bd-s[i][j];
                 v[i][j]=-v[i][j];
@@ -225,6 +229,7 @@ void walk(double s[][3], double v[][3], double f[][3], double vp[][3][2], int n,
     return;
 }
 
+//Sum an array
 double sumarray(double a[], int n)
 {
     int i;
@@ -238,6 +243,8 @@ double sumarray(double a[], int n)
     return temp;
 }
 
+//Center of mass correction
+//Make the center of mass fixed
 void cmcorr(double a[][3], int n)
 {
     double sum, temp;
@@ -259,6 +266,7 @@ void cmcorr(double a[][3], int n)
     return;
 }
 
+//Calculate force
 void calf(double s[][3], double f[][3], int n, double sig, double eps)
 {
     int i, j, k;
@@ -284,7 +292,7 @@ void calf(double s[][3], double f[][3], int n, double sig, double eps)
             d=sqrt(d2);
             temp2=sig2/d2;
             temp6=temp2*temp2*temp2;
-            fmag=24*eps/d*(2*temp6-1)*temp6;                                //Calculate force
+            fmag=24*eps/d*(2*temp6-1)*temp6;                                //Calculate force in Lennard-Jones potential
             for (k=0; k<3; ++k)
             {
                 ftemp=fmag*r[k]/d;
@@ -295,6 +303,7 @@ void calf(double s[][3], double f[][3], int n, double sig, double eps)
     };
 }
 
+//Calculate new velocity
 void calv(double v[][3], double f[][3], int n, double mass, double deltat)
 {
     int i, j;
@@ -309,6 +318,7 @@ void calv(double v[][3], double f[][3], int n, double mass, double deltat)
     return;
 }
 
+//Heat bath
 void thermalbath(double parv[][3], double temperature, double t0, double n, double tau)
 {
     int i, j;
